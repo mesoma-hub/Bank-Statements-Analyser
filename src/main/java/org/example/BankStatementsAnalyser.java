@@ -13,18 +13,15 @@ public class BankStatementsAnalyser {
     public BankStatementsAnalyser() {
     }
 
-    public void analyse(String fileName, BankStatementParser bankStatementParser) throws IOException {
+    public void analyse(String fileName, BankStatementParser bankStatementParser,
+                        final Exporter exporter) throws IOException {
         Path path = Paths.get("src/main/resources/" + fileName);
         List<String> lines = Files.readAllLines(path);
         List<BankTransaction> bankTransactions = bankStatementParser.parseFromLines(lines);
         BankStatementProcessor bankStatementProcessor = new BankStatementProcessor(bankTransactions);
-        collectSummary(bankStatementProcessor);
+
+        final SummaryStatistics summaryStatistics = bankStatementProcessor.summarizeTransactions();
+        System.out.println(exporter.export(summaryStatistics));
     }
 
-    private static void collectSummary(BankStatementProcessor bankStatementProcessor) {
-        System.out.println("The total for all transactions is " + bankStatementProcessor.calculateTotalAmount());
-        System.out.println("The total transactions in January " + bankStatementProcessor.calculateTotalInMonth(Month.JANUARY));
-        System.out.println("The total transactions in February " + bankStatementProcessor.calculateTotalInMonth(Month.FEBRUARY));
-        System.out.println("The total salary received: " + bankStatementProcessor.calculateTotalForCategory("Salary"));
-    }
 }
